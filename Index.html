@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base Bug WA - Addi Premium</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #000;
+      color: white;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* --- INTRO VIDEO FULLSCREEN --- */
+    #intro-container {
+      position: fixed; inset: 0;
+      background: #000; z-index: 10000;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 1s ease;
+    }
+    #intro-video { width: 100%; height: 100%; object-fit: cover; }
+
+    /* UI Panels */
+    #login-screen, #main-panel, #shader-panel, #settings-panel {
+      display: none;
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .control-panel {
+      background: rgba(25, 18, 55, 0.85); backdrop-filter: blur(20px);
+      margin: 18px; padding: 28px 24px; border-radius: 26px;
+      border: 1px solid rgba(192,38,211,0.3);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    h2 { text-align: center; color: #e0bbff; margin-bottom: 25px; font-size: 23px; text-transform: uppercase; letter-spacing: 2px; }
+    label { display: block; margin: 16px 0 8px; font-size: 14.5px; color: #c4b5fd; }
+    
+    input, select {
+      width: 100%; padding: 16px 18px; background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(167,139,250,0.5); border-radius: 16px;
+      color: white; font-size: 16px; outline: none; transition: 0.3s;
+    }
+
+    .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+
+    button, .tiktok-promo-btn {
+      color: white; border: none; padding: 17px; width: 100%;
+      font-size: 16px; font-weight: 700; border-radius: 18px;
+      cursor: pointer; transition: 0.3s; text-decoration: none;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+
+    .send-btn { background: linear-gradient(90deg, #c026d3, #ec4899); box-shadow: 0 10px 25px rgba(192,38,211,0.5); }
+    .switch-btn { background: linear-gradient(90deg, #7c3aed, #6366f1); }
+    .settings-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+    
+    .tiktok-promo-btn {
+      background: #000; border: 2px solid #ff0050; margin-top: 15px;
+      box-shadow: 0 0 15px rgba(255, 0, 80, 0.4);
+    }
+
+    /* SALURAN WA BUTTON */
+    .wa-admin-btn {
+      background: #25d366; color: #fff; text-decoration: none;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 20px;
+      animation: pulseWA 2s infinite;
+    }
+    @keyframes pulseWA { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
+
+    /* BANNER VIDEO */
+    .banner-vid {
+      width: 100%; max-width: 320px; height: 180px; 
+      border-radius: 18px; margin: 0 auto 20px; display: block;
+      object-fit: cover; border: 2px solid #c026d3;
+    }
+
+    /* Success Popup */
+    .success {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: rgba(15, 10, 35, 0.98); backdrop-filter: blur(20px);
+      padding: 35px; border-radius: 26px; text-align: center;
+      box-shadow: 0 0 60px #22c55e; display: none; z-index: 1000; border: 2px solid #4ade80;
+    }
+    .success i { font-size: 60px; color: #4ade80; margin-bottom: 15px; display: block; }
+  </style>
+</head>
+<body>
+
+  <audio id="sfx-intro" src="https://files.catbox.moe/t11mom.mp3"></audio>
+  <audio id="sfx-ui" src="https://files.catbox.moe/bcuudy.m4a"></audio>
+
+  <div id="intro-container">
+    <video id="intro-video" autoplay muted playsinline>
+      <source src="https://files.catbox.moe/6m49u9.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div id="login-screen" style="position: fixed; inset: 0; align-items: center; justify-content: center; background: #000;">
+    <div class="control-panel" style="width: 92%; max-width: 380px;">
+      <h2>Login Access</h2>
+      <label>Reseller Name</label>
+      <input type="text" id="username" placeholder="Masukkan Nama...">
+      <label>Keys Access</label>
+      <input type="password" id="password" placeholder="Ketik: password">
+      <button class="send-btn" onclick="login()" style="margin-top:20px;">AUTHORIZE</button>
+      
+      <a href="https://whatsapp.com/channel/0029VbCiUUdA2pL3ASg7vV0b" class="wa-admin-btn">
+        <i class="fab fa-whatsapp"></i> JOIN SALURAN (KEYS ACCESS)
+      </a>
+    </div>
+  </div>
+
+  <div id="main-panel">
+    <div style="background: linear-gradient(to right, #6b21a8, #c026d3); padding: 20px 15px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.5);">
+      <div style="background: rgba(255,255,255,0.1); border-radius: 50px; padding: 10px 22px; width: 90%; margin: 0 auto; color: #fff; font-size: 14px; font-weight: bold;">
+        <i class="fas fa-shield-alt"></i> ADDI VIP BUG V2.5
+      </div>
+    </div>
+
+    <div class="control-panel">
+      <h2>Bug Controller</h2>
+      
+      <video class="banner-vid" autoplay muted loop playsinline>
+        <source src="https://files.catbox.moe/6m49u9.mp4" type="video/mp4">
+      </video>
+
+      <label>Target Number</label>
+      <input type="text" id="nomor" placeholder="+62 8xx-xxxx-xxxx">
+
+      <label>Payload Type</label>
+      <select id="bug">
+        <option>FORCE CLOSE (LITE)</option>
+        <option>MEGA CRASHER V4</option>
+        <option>PERMANENT BAN BOOT</option>
+        <option>FREEZE UI (24H)</option>
+      </select>
+
+      <div class="btn-group">
+        <button class="send-btn" onclick="kirimBug()">▶ EXECUTE ATTACK</button>
+        <button class="switch-btn" onclick="showPanel('shader-panel')">OPEN SHADER UI</button>
+        <button class="settings-btn" onclick="showPanel('settings-panel')">⚙️ SETTINGS</button>
+        
+        <a href="https://vt.tiktok.com/ZSHxs8CJ4/" target="_blank" class="tiktok-promo-btn">
+          <i class="fab fa-tiktok"></i> FOLLOW TIKTOK ADDI
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="settings-panel">
+    <div class="control-panel" style="margin-top:50px;">
+      <h2>Reseller Profile</h2>
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div style="width: 80px; height: 80px; background: #c026d3; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 30px;">👤</div>
+        <h3 id="profileNameDisplay" style="color: #fff;">User Name</h3>
+      </div>
+      <label>Account Name (Sync)</label>
+      <input type="text" id="accName" placeholder="Update name...">
+      <button class="send-btn" onclick="saveSettings()" style="margin-top:20px;">SAVE PROFILE</button>
+      <button class="switch-btn" style="margin-top:15px;" onclick="showPanel('main-panel')">← BACK TO HOME</button>
+    </div>
+  </div>
+
+  <div id="shader-panel">
+    <div class="control-panel" style="margin-top:70px;">
+      <h2>Shader Configuration</h2>
+      <label>Shader ID</label>
+      <input type="text" placeholder="SHD-992-X">
+      <button class="send-btn" onclick="pasangShader()">INJECT SHADER</button>
+      <button class="switch-btn" style="margin-top:15px;" onclick="showPanel('main-panel')">← BACK</button>
+    </div>
+  </div>
+
+  <div id="success" class="success">
+    <i class="fas fa-check-circle"></i>
+    <h2 id="msgTitle" style="color:#4ade80;">BERHASIL!</h2>
+    <p id="targetInfo" style="margin:15px 0; color:#c4b5fd;"></p>
+  </div>
+
+  <script>
+    const introCont = document.getElementById('intro-container');
+    const sfxIntro = document.getElementById('sfx-intro');
+    const sfxUI = document.getElementById('sfx-ui');
+
+    // Intro Handler + Sound
+    window.onload = () => {
+      sfxIntro.play().catch(() => console.log("Audio blocked by browser"));
+      setTimeout(closeIntro, 10000); 
+    };
+
+    function closeIntro() {
+      introCont.style.opacity = '0';
+      setTimeout(() => {
+        introCont.style.display = 'none';
+        document.getElementById('login-screen').style.display = 'flex';
+      }, 1000);
+    }
+
+    function playUI() {
+      sfxUI.currentTime = 0;
+      sfxUI.play();
+    }
+
+    function login() {
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      
+      // KEY AKSES: follow
+      if(u.trim() !== "" && p === "follow") {
+        playUI();
+        document.getElementById('accName').value = u;
+        document.getElementById('profileNameDisplay').innerText = u;
+        showPanel('main-panel');
+      } else {
+        alert("Keys Akses Salah! Join Saluran WA Untuk Ambil Keys.");
+      }
+    }
+
+    function showPanel(id) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('main-panel').style.display = 'none';
+      document.getElementById('shader-panel').style.display = 'none';
+      document.getElementById('settings-panel').style.display = 'none';
+      const target = document.getElementById(id);
+      if (id === 'login-screen') target.style.display = 'flex';
+      else target.style.display = 'block';
+    }
+
+    function kirimBug() {
+      const n = document.getElementById('nomor').value;
+      if (!n) return alert("Nomor Target Kosong!");
+      
+      playUI();
+      document.getElementById('msgTitle').innerText = "BUG TERKIRIM!";
+      document.getElementById('targetInfo').innerHTML = `Target: ${n}<br>Status: Centang Ijo Berhasil!`;
+      document.getElementById('success').style.display = 'block';
+      
+      setTimeout(() => { document.getElementById('success').style.display = 'none'; }, 4000);
+    }
+
+    function pasangShader() {
+      playUI();
+      document.getElementById('msgTitle').innerText = "SHADER TERPASANG!";
+      document.getElementById('targetInfo').innerHTML = `Status: Centang Ijo Berhasil!<br>Shader Aktif di System.`;
+      document.getElementById('success').style.display = 'block';
+      
+      setTimeout(() => { document.getElementById('success').style.display = 'none'; }, 4000);
+    }
+
+    function saveSettings() {
+      playUI();
+      const nameInput = document.getElementById('accName').value;
+      document.getElementById('profileNameDisplay').innerText = nameInput;
+      alert("Profile Updated!");
+      showPanel('main-panel');
+    }
+  </script>
+</body>
+</html>
